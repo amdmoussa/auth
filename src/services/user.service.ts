@@ -28,13 +28,11 @@ class UserService {
      * Get all users with filtering and pagination
      * @param filter - Filter object (e.g., { role: 'user' })
      * @param options - Pagination options { skip, limit }
-     * @param requestingUserRole - Role of the user making the request
      * @returns Array of users
      */
     async getAllUsers(
         filter: UserFilter = {},
-        options: PaginationOptions = {},
-        requestingUserRole: string
+        options: PaginationOptions = {}
     ) {
         const { skip = 0, limit } = options;
 
@@ -52,10 +50,9 @@ class UserService {
     /**
      * Get total count of users matching filter
      * @param filter - Filter object
-     * @param requestingUserRole - Role of the user making the request
      * @returns Total count
      */
-    async getAllUsersCount(filter: UserFilter = {}, requestingUserRole: string): Promise<number> {
+    async getAllUsersCount(filter: UserFilter = {}): Promise<number> {
         return await User.countDocuments(filter);
     }
 

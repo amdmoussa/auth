@@ -114,7 +114,10 @@ export const RESPONSE_MESSAGES = {
     USER_CREATED: 'User created successfully',
     USER_UPDATED: 'User updated successfully',
     USER_DELETED: 'User deleted successfully',
+    USER_RETRIEVED: 'User retrieved successfully',
     USERS_RETRIEVED: 'Users retrieved successfully',
+    FAILED_RETRIEVE_USER: 'Failed to retrieve user',
+    FAILED_RETRIEVE_USERS: 'Failed to retrieve users',
     
     // Validation errors
     VALIDATION_FAILED: 'Validation failed',

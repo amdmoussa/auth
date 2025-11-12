@@ -5,14 +5,13 @@
 //
 
 const userService = require('../services/user.service');
-const { USER_ROLES, RESPONSE_MESSAGES, RESPONSE_STATUS, HTTP_STATUS, PAGINATION } = require('../config/config');
+const { USER_ROLES, RESPONSE_MESSAGES, RESPONSE_STATUS, HTTP_STATUS } = require('../config/config');
 
 const getAllUsers = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = limit > 0 ? (page - 1) * limit : 0;
-        const requestingUserRole = req.user.role;
 
         let filter = {
             role: ""
@@ -26,13 +25,13 @@ const getAllUsers = async (req, res) => {
             userService.getAllUsers(filter, {
                 skip,
                 limit: limit > 0 ? limit : undefined
-            }, requestingUserRole),
-            userService.getAllUsersCount(filter, requestingUserRole)
+            }),
+            userService.getAllUsersCount(filter)
         ]);
 
         res.status(200).json({
-            status: 'success',
-            message: 'Users retrieved successfully',
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.USERS_RETRIEVED,
             data: {
                 users,
                 pagination: {
@@ -45,8 +44,8 @@ const getAllUsers = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            status: 'error',
-            message: 'Failed to retrieve users',
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.FAILED_RETRIEVE_USERS,
             error: {
                 details: error.message
             }
@@ -59,24 +58,24 @@ const getUserById = async (req, res) => {
     try {
         const user = await userService.getUserById(id);
         if (!user) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'User not found',
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
                     details: `No user found with id: ${id}`
                 }
             });
         }
 
-        res.status(200).json({
-            status: 'success',
-            message: 'User retrieved successfully',
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.USER_RETRIEVED,
             data: { user }
         });
     } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to retrieve user',
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.FAILED_RETRIEVE_USER,
             error: {
                 details: error.message
             }
@@ -90,11 +89,11 @@ const createAdmin = async (req, res) => {
 
         // Validate required fields
         if (!email || !username || !password) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Validation failed',
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
-                    details: 'Email, username, and password are required'
+                    details: RESPONSE_MESSAGES.EMAIL_USERNAME_PASSWORD_REQUIRED
                 }
             });
         }
@@ -107,15 +106,15 @@ const createAdmin = async (req, res) => {
             role: USER_ROLES.ADMIN
         });
 
-        res.status(201).json({
-            status: 'success',
-            message: 'Admin created successfully',
+        res.status(HTTP_STATUS.CREATED).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.USER_CREATED,
             data: { admin }
         });
     } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to create admin',
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.SIGNUP_FAILED,
             error: {
                 details: error.message
             }
@@ -130,11 +129,11 @@ const updateUser = async (req, res) => {
 
         // Prevent role escalation unless admin
         if (updates.role && req.user.role !== USER_ROLES.ADMIN) {
-            return res.status(403).json({
-                status: 'error',
-                message: 'Forbidden',
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.ACCESS_DENIED,
                 error: {
-                    details: 'Only admins can change user roles'
+                    details: RESPONSE_MESSAGES.ONLY_ADMIN_CAN_CHANGE_ROLES
                 }
             });
         }
@@ -144,24 +143,24 @@ const updateUser = async (req, res) => {
         const updatedUser = await userService.updateUser(id, updates);
 
         if (!updatedUser) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'User not found',
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
                     details: `No user found with id: ${id}`
                 }
             });
         }
 
-        res.status(200).json({
-            status: 'success',
-            message: 'User updated successfully',
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.USER_UPDATED,
             data: { user: updatedUser }
         });
     } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to update user',
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.SIGNUP_FAILED,
             error: {
                 details: error.message
             }
@@ -174,11 +173,11 @@ const deleteUser = async (req, res) => {
     try {
         // Prevent users from deleting themselves
         if (req.user.id === id && req.user.role !== USER_ROLES.ADMIN) {
-            return res.status(403).json({
-                status: 'error',
-                message: 'Forbidden',
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.ACCESS_DENIED,
                 error: {
-                    details: 'You cannot delete your own account'
+                    details: RESPONSE_MESSAGES.CANNOT_DELETE_OWN_ACCOUNT
                 }
             });
         }
@@ -186,24 +185,24 @@ const deleteUser = async (req, res) => {
         const deletedUser = await userService.deleteUser(id);
 
         if (!deletedUser) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'User not found',
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
                     details: `No user found with id: ${id}`
                 }
             });
         }
 
-        res.status(200).json({
-            status: 'success',
-            message: 'User deleted successfully',
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.USER_DELETED,
             data: { user: deletedUser }
         });
     } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to delete user',
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.SIGNUP_FAILED,
             error: {
                 details: error.message
             }

@@ -14,6 +14,7 @@ const morgan = require('morgan');
 
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const { RESPONSE_MESSAGES, HTTP_STATUS } = require('./config/config');
 
 require('dotenv').config()
 
@@ -35,9 +36,9 @@ mongoose.connect(process.env.DB_URI)
     .catch((err) => {
         console.error('Failed to connect to the database:', err.message);
         app.use((req, res) => {
-            res.status(500).json({
+            res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
                 error: {
-                    message: 'DB connection failed. Some features may not work as expected.'
+                    message: RESPONSE_MESSAGES.DB_CONNECTION_FAILED
                 }
             });
         });
@@ -45,21 +46,24 @@ mongoose.connect(process.env.DB_URI)
 
 // MARK: Default route
 app.get('/', (req, res) => {
-    res.status(200).json({
-        message: "Hillo!"
+    res.status(HTTP_STATUS.OK).json({
+        status: 'ok',
+        message: 'Hillo!'
     });
 });
 
 // MARK: Error handling
-app.use((next) => {
-    const error = new Error("Not found");
+app.use((req, res, next) => {
+    const error: any = new Error('Not found');
+    error.status = HTTP_STATUS.NOT_FOUND;
     next(error);
 });
 
-app.use((error, res) => {
-    res.status(error.status || 500).json({
+app.use((err: any, req, res, next) => {
+    res.status(err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        status: 'error',
         error: {
-            message: error.message
+            message: err.message
         }
     });
 });

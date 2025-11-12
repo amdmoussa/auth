@@ -49,7 +49,7 @@ const login = async (req, res) => {
             message: RESPONSE_MESSAGES.LOGIN_SUCCESS,
             data: {
                 user: {
-                    id: user._id,
+                    _id: user._id,
                     email: user.email,
                     username: user.username,
                     role: user.role
@@ -113,7 +113,7 @@ const signup = async (req, res) => {
             message: RESPONSE_MESSAGES.SIGNUP_SUCCESS,
             data: {
                 user: {
-                    id: user._id,
+                    _id: user._id,
                     email: user.email,
                     username: user.username,
                     role: user.role
