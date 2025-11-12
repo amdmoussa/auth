@@ -11,10 +11,25 @@ npm start
 
 Server runs on `http://localhost:3000`
 
+## TODOS
+- Add email verification support (for account creation and email confirmation)
+- Implement two-factor authentication (2FA) using TOTP or SMS
+- Add password reset functionality with secure reset tokens
+- Implement rate limiting
+- Audit logging for security events
+- Proper CORS configuration
+
+### Nice-to-Have Features
+- Session management and device tracking
+- Implement OAuth 2.0 server for third-party integrations
+- Add webhook support for auth events
+- Implement backup codes for 2FA recovery
+- Analytics and security insights
+
 ## Architecture
 
 Core components:
-- **JWT Access Tokens**: Short-lived (2 minutes), used for API requests
+- **JWT Access Tokens**: Short-lived (15 minutes), used for API requests
 - **Refresh Tokens**: Long-lived (7 days), stored in database, used to get new access tokens
 - **Role-Based Access Control**: User and Admin roles with middleware protection
 - **Cron Job**: Hourly cleanup of expired tokens from database
@@ -51,7 +66,7 @@ PASSWORD_RESET_TOKEN_EXPIRY_HOURS=1
 
 ## Token Refresh Flow
 
-1. User logs in and receives access token (2 min) and refresh token (7 days)
+1. User logs in and receives access token (15 minutes) and refresh token (7 days)
 2. Frontend automatically refreshes access token 1 minute before expiry
 3. When access token expires and user makes a request, automatic retry after refresh
 4. User is never logged out unless refresh token expires or is revoked
