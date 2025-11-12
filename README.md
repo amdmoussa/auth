@@ -19,7 +19,7 @@ Server runs on `http://localhost:3000`
 - Audit logging for security events
 - Proper CORS configuration
 
-### Nice-to-Have Features
+### Might add (not sure)
 - Session management and device tracking
 - Implement OAuth 2.0 server for third-party integrations
 - Add webhook support for auth events
@@ -50,7 +50,7 @@ Core components:
 - `PUT /user/:id` - Update user (self or admin)
 - `DELETE /user/:id` - Delete user (self or admin)
 
-## Environment Variables
+## Environment variables
 
 `.env` file in backend root:
 
