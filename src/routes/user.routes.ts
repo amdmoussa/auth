@@ -12,7 +12,8 @@ const userController = require('../controllers/user.controller');
 const {
     authenticateToken,
     isAdmin,
-    isOwnerOrAdmin
+    isOwnerOrAdmin,
+    isSuperAdmin
 } = require('../middlewares/auth.middleware');
 
 // how all users (admin only)
@@ -21,11 +22,11 @@ router.get('/', authenticateToken, isAdmin, userController.getAllUsers);
 // show one user (self or admin)
 router.get('/:id', authenticateToken, isOwnerOrAdmin, userController.getUserById);
 
-// create admin (admin only)
-router.post('/admin', authenticateToken, isAdmin, userController.createAdmin);
+// create admin (superadmin only)
+router.post('/admin', authenticateToken, isSuperAdmin, userController.createAdmin);
 
-// update user (self or admin)
-router.put('/:id', authenticateToken, isOwnerOrAdmin, userController.updateUser);
+// update user (superadmin for role changes, otherwise self or admin)
+router.put('/:id', authenticateToken, isSuperAdmin, userController.updateUser);
 
 // delete user (self or admin)
 router.delete('/:id', authenticateToken, isOwnerOrAdmin, userController.deleteUser);

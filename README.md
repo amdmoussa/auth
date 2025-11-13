@@ -31,8 +31,31 @@ Server runs on `http://localhost:3000`
 Core components:
 - **JWT Access Tokens**: Short-lived (15 minutes), used for API requests
 - **Refresh Tokens**: Long-lived (7 days), stored in database, used to get new access tokens
-- **Role-Based Access Control**: User and Admin roles with middleware protection
+- **Role-Based Access Control**: Three-tier hierarchy (User, Admin, SuperAdmin) with middleware protection
 - **Cron Job**: Hourly cleanup of expired tokens from database
+
+## Role Hierarchy
+
+The system uses a three-tier role hierarchy for granular permission control:
+
+### User (Regular User)
+- Can view and update own profile
+- Can delete own account
+- No access to user management endpoints
+
+### Admin
+- Can view all users
+- Can view and update any user profile
+- Can delete any user (except SuperAdmin)
+- Cannot create new admins (SuperAdmin only)
+- Cannot change roles (SuperAdmin only)
+
+### SuperAdmin
+- Full system access
+- Can create and delete admin accounts
+- Can change user roles
+- Cannot be deleted by anyone (including themselves)
+- Cannot change their own role (self-protection)
 
 ## API Endpoints
 
@@ -46,9 +69,9 @@ Core components:
 ### Users
 - `GET /user/` - Get all users (admin only)
 - `GET /user/:id` - Get user by ID (self or admin)
-- `POST /user/admin` - Create admin user (admin only)
-- `PUT /user/:id` - Update user (self or admin)
-- `DELETE /user/:id` - Delete user (self or admin)
+- `POST /user/admin` - Create admin user (superadmin only)
+- `PUT /user/:id` - Update user (superadmin for role changes, otherwise self)
+- `DELETE /user/:id` - Delete user (self, admin, or superadmin)
 
 ## Environment variables
 
@@ -78,7 +101,7 @@ PASSWORD_RESET_TOKEN_EXPIRY_HOURS=1
 - email (unique)
 - username (unique)
 - password (hashed with bcrypt)
-- role (user or admin)
+- role (user | admin | superadmin)
 - isVerified (boolean)
 - timestamps
 
@@ -107,8 +130,11 @@ curl -X PUT http://localhost:3000/user/:id \
 - JWTs signed with secret key
 - Access tokens are short-lived
 - Refresh tokens stored in database (not in JWT)
-- Role-based access control on protected routes
+- Three-tier role-based access control with middleware protection
+- SuperAdmin accounts protected from deletion
 - Passwords excluded from all API responses
+- CORS and Helmet security headers enabled
+- Validation on all inputs
 - CORS and Helmet security headers enabled
 - Validation on all inputs
 

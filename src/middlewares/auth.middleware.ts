@@ -88,8 +88,29 @@ const isOwnerOrAdmin = async (req, res, next): Promise<void> => {
     next();
 };
 
+const isSuperAdmin = async (req, res, next): Promise<void> => {
+    if (!req.user) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.AUTH_REQUIRED
+        });
+        return;
+    }
+
+    if (req.user.role !== USER_ROLES.SUPER_ADMIN) {
+        res.status(HTTP_STATUS.FORBIDDEN).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.SUPERADMIN_REQUIRED
+        });
+        return;
+    }
+
+    next();
+};
+
 module.exports = {
     authenticateToken,
     isAdmin,
     isOwnerOrAdmin,
+    isSuperAdmin,
 };

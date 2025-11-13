@@ -130,15 +130,18 @@ const updateUser = async (req, res) => {
     try {
         const updates = req.body;
 
-        // Prevent role escalation unless admin
-        if (updates.role && req.user.role !== USER_ROLES.ADMIN) {
-            return res.status(HTTP_STATUS.FORBIDDEN).json({
-                status: RESPONSE_STATUS.ERROR,
-                message: RESPONSE_MESSAGES.ACCESS_DENIED,
-                error: {
-                    details: RESPONSE_MESSAGES.ONLY_ADMIN_CAN_CHANGE_ROLES
-                }
-            });
+        // Role change restrictions - only super admin can change roles
+        if (updates.role) {
+            // Super admin cannot demote themselves
+            if (req.user.id === id && updates.role !== USER_ROLES.SUPER_ADMIN) {
+                return res.status(HTTP_STATUS.FORBIDDEN).json({
+                    status: RESPONSE_STATUS.ERROR,
+                    message: RESPONSE_MESSAGES.ACCESS_DENIED,
+                    error: {
+                        details: 'Super admin cannot change their own role'
+                    }
+                });
+            }
         }
 
         delete updates.password;
@@ -174,13 +177,38 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
-        // Prevent users from deleting themselves
-        if (req.user.id === id && req.user.role !== USER_ROLES.ADMIN) {
+        // Check if target user is super admin - cannot be deleted by anyone
+        const targetUser = await userService.getUserById(id);
+        if (!targetUser) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.USER_NOT_FOUND,
+                error: {
+                    details: `No user found with id: ${id}`
+                }
+            });
+        }
+
+        if (targetUser.role === USER_ROLES.SUPER_ADMIN) {
             return res.status(HTTP_STATUS.FORBIDDEN).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.ACCESS_DENIED,
                 error: {
-                    details: RESPONSE_MESSAGES.CANNOT_DELETE_OWN_ACCOUNT
+                    details: RESPONSE_MESSAGES.CANNOT_DELETE_SUPERADMIN
+                }
+            });
+        }
+
+        // Allow deletion of own account or admin/superadmin deleting others
+        const isOwnAccount = req.user.id === id;
+
+        // Only owner or admin can delete a user
+        if (!isOwnAccount && req.user.role !== USER_ROLES.ADMIN && req.user.role !== USER_ROLES.SUPER_ADMIN) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.ACCESS_DENIED,
+                error: {
+                    details: 'You can only delete your own account'
                 }
             });
         }

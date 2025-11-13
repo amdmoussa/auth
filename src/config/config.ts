@@ -63,6 +63,7 @@ export const TOKEN_TYPES = {
 export const USER_ROLES = {
     USER: 'user',
     ADMIN: 'admin',
+    SUPER_ADMIN: 'superadmin',
 } as const;
 
 // ===================================
@@ -128,9 +129,10 @@ export const RESPONSE_MESSAGES = {
     
     // Authorization errors
     ADMIN_REQUIRED: 'Admin access required',
+    SUPERADMIN_REQUIRED: 'Super admin access required',
     ACCESS_DENIED: 'Access denied',
-    CANNOT_DELETE_OWN_ACCOUNT: 'You cannot delete your own account',
     ONLY_ADMIN_CAN_CHANGE_ROLES: 'Only admins can change user roles',
+    ONLY_SUPERADMIN_CAN_MANAGE_ADMINS: 'Only super admins can create, modify, or delete admin accounts',
     
     // Database errors
     DB_CONNECTION_FAILED: 'DB connection failed. Some features may not work as expected.',
@@ -172,7 +174,6 @@ export const PAGINATION = {
 
 export const DATABASE_CONFIG = {
     URI: DB_URI,
-    // MongoDB connection options
     OPTIONS: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
