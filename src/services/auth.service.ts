@@ -6,7 +6,10 @@
 
 const Token = require('../models/token.model');
 const crypto = require('crypto');
-const { AUTH_CONFIG, TOKEN_TYPES } = require('../config/config');
+const {
+    AUTH_CONFIG,
+    TOKEN_TYPES
+} = require('../config/config');
 
 interface TokenData {
     userId: string;
@@ -24,7 +27,6 @@ class AuthService {
     async generateRefreshToken(userId: string): Promise<string> {
         const tokenString = crypto.randomBytes(48).toString('base64');
 
-        // Calculate expiration date using config
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + AUTH_CONFIG.REFRESH_TOKEN_EXPIRY_DAYS);
 
@@ -155,7 +157,6 @@ class AuthService {
                 return null;
             }
 
-            // Delete token after use (one-time use)
             await Token.findByIdAndDelete(token._id);
 
             return token.userId.toString();

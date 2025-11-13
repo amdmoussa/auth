@@ -8,14 +8,21 @@ const jwt = require('jsonwebtoken');
 
 const userService = require('../services/user.service');
 const authService = require('../services/auth.service');
-const { AUTH_CONFIG, RESPONSE_MESSAGES, RESPONSE_STATUS, VALIDATION, USER_ROLES } = require('../config/config');
+const {
+    AUTH_CONFIG,
+    RESPONSE_MESSAGES,
+    RESPONSE_STATUS,
+    VALIDATION,
+    USER_ROLES,
+    HTTP_STATUS
+} = require('../config/config');
 
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
@@ -27,7 +34,7 @@ const login = async (req, res) => {
         const user = await userService.verifyCredentials(email, password);
 
         if (!user) {
-            return res.status(401).json({
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.INVALID_CREDENTIALS,
                 error: {
@@ -44,7 +51,7 @@ const login = async (req, res) => {
 
         const refreshToken = await authService.generateRefreshToken(user._id);
 
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.LOGIN_SUCCESS,
             data: {
@@ -59,7 +66,7 @@ const login = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.LOGIN_FAILED,
             error: {
@@ -74,7 +81,7 @@ const signup = async (req, res) => {
         const { email, username, password } = req.body;
 
         if (!email || !username || !password) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
@@ -84,7 +91,7 @@ const signup = async (req, res) => {
         }
 
         if (password.length < VALIDATION.PASSWORD_MIN_LENGTH) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
@@ -108,7 +115,7 @@ const signup = async (req, res) => {
 
         const refreshToken = await authService.generateRefreshToken(user._id);
 
-        res.status(201).json({
+        res.status(HTTP_STATUS.CREATED).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.SIGNUP_SUCCESS,
             data: {
@@ -123,7 +130,7 @@ const signup = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.SIGNUP_FAILED,
             error: {
@@ -138,7 +145,7 @@ const logout = async (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
@@ -149,12 +156,12 @@ const logout = async (req, res) => {
 
         await authService.revokeRefreshToken(refreshToken);
 
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.LOGOUT_SUCCESS
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.LOGOUT_FAILED,
             error: {
@@ -169,7 +176,7 @@ const refresh = async (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
@@ -181,7 +188,7 @@ const refresh = async (req, res) => {
         const tokenData = await authService.verifyRefreshToken(refreshToken);
 
         if (!tokenData) {
-            return res.status(401).json({
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.INVALID_TOKEN,
                 error: {
@@ -193,7 +200,7 @@ const refresh = async (req, res) => {
         const user = await userService.getUserById(tokenData.userId);
 
         if (!user) {
-            return res.status(404).json({
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
@@ -212,7 +219,7 @@ const refresh = async (req, res) => {
 
         await authService.revokeRefreshToken(refreshToken);
 
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.TOKEN_REFRESH_SUCCESS,
             data: {
@@ -221,7 +228,7 @@ const refresh = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.TOKEN_REFRESH_FAILED,
             error: {
@@ -236,7 +243,7 @@ const revoke = async (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.VALIDATION_FAILED,
                 error: {
@@ -247,14 +254,61 @@ const revoke = async (req, res) => {
 
         await authService.revokeRefreshToken(refreshToken);
 
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.TOKEN_REVOKE_SUCCESS
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.TOKEN_REVOKE_FAILED,
+            error: {
+                details: error.message
+            }
+        });
+    }
+};
+
+const revokeAll = async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+
+        if (!accessToken) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.VALIDATION_FAILED,
+                error: {
+                    details: 'Access token is required'
+                }
+            });
+        }
+
+        const decoded = jwt.verify(accessToken, AUTH_CONFIG.JWT_SECRET);
+        const userId = decoded.id;
+
+        if (!userId) {
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.VALIDATION_FAILED,
+                error: {
+                    details: 'Invalid access token'
+                }
+            });
+        }
+
+        const revokedCount = await authService.revokeAllUserTokens(userId);
+
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: `${revokedCount} refresh token(s) revoked successfully`,
+            data: {
+                revokedCount
+            }
+        });
+    } catch (error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: 'Failed to revoke all tokens',
             error: {
                 details: error.message
             }
@@ -267,5 +321,6 @@ module.exports = {
     signup,
     logout,
     refresh,
-    revoke
+    revoke,
+    revokeAll
 };

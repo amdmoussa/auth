@@ -10,19 +10,22 @@ const router = express.Router();
 
 const authController = require('../controllers/auth.controller');
 
-// post - login (public)
+// login (public)
 router.post('/login', authController.login);
 
-// post - signup (public)
+// signup (public)
 router.post('/signup', authController.signup);
 
-// post - logout (requires valid token)
+// logout (requires valid token)
 router.post('/logout', authController.logout);
 
-// post - refresh access token (requires valid refresh token)
+// refresh access token (requires valid refresh token)
 router.post('/refresh', authController.refresh);
 
-// post - revoke refresh token (requires valid refresh token)
+// revoke refresh token (requires valid refresh token)
 router.post('/revoke', authController.revoke);
+
+// revoke all refresh tokens for user (requires valid access token)
+router.post('/revoke-all', authController.revokeAll);
 
 module.exports = router;

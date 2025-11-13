@@ -5,7 +5,13 @@
 //
 
 const jwt = require('jsonwebtoken');
-const { AUTH_CONFIG, RESPONSE_MESSAGES, USER_ROLES, HTTP_STATUS } = require('../config/config');
+const {
+    AUTH_CONFIG,
+    RESPONSE_MESSAGES,
+    RESPONSE_STATUS,
+    USER_ROLES,
+    HTTP_STATUS
+} = require('../config/config');
 
 
 const authenticateToken = async (req, res, next): Promise<void> => {
@@ -15,7 +21,7 @@ const authenticateToken = async (req, res, next): Promise<void> => {
 
         if (!token) {
             res.status(HTTP_STATUS.UNAUTHORIZED).json({
-                status: 'error',
+                status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.ACCESS_TOKEN_REQUIRED
             });
             return;
@@ -31,7 +37,7 @@ const authenticateToken = async (req, res, next): Promise<void> => {
         next();
     } catch (error) {
         res.status(HTTP_STATUS.FORBIDDEN).json({
-            status: 'error',
+            status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.INVALID_TOKEN
         });
         return;
@@ -41,7 +47,7 @@ const authenticateToken = async (req, res, next): Promise<void> => {
 const isAdmin = async (req, res, next): Promise<void> => {
     if (!req.user) {
         res.status(HTTP_STATUS.UNAUTHORIZED).json({
-            status: 'error',
+            status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.AUTH_REQUIRED
         });
         return;
@@ -49,7 +55,7 @@ const isAdmin = async (req, res, next): Promise<void> => {
 
     if (req.user.role !== USER_ROLES.ADMIN) {
         res.status(HTTP_STATUS.FORBIDDEN).json({
-            status: 'error',
+            status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.ADMIN_REQUIRED
         });
         return;
@@ -61,7 +67,7 @@ const isAdmin = async (req, res, next): Promise<void> => {
 const isOwnerOrAdmin = async (req, res, next): Promise<void> => {
     if (!req.user) {
         res.status(HTTP_STATUS.UNAUTHORIZED).json({
-            status: 'error',
+            status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.AUTH_REQUIRED
         });
         return;
@@ -73,7 +79,7 @@ const isOwnerOrAdmin = async (req, res, next): Promise<void> => {
 
     if (!isOwner && !isAdminRole) {
         res.status(HTTP_STATUS.FORBIDDEN).json({
-            status: 'error',
+            status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.ACCESS_DENIED
         });
         return;

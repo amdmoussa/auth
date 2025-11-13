@@ -5,7 +5,12 @@
 //
 
 const userService = require('../services/user.service');
-const { USER_ROLES, RESPONSE_MESSAGES, RESPONSE_STATUS, HTTP_STATUS } = require('../config/config');
+const {
+    USER_ROLES,
+    RESPONSE_MESSAGES,
+    RESPONSE_STATUS,
+    HTTP_STATUS
+} = require('../config/config');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -29,7 +34,7 @@ const getAllUsers = async (req, res) => {
             userService.getAllUsersCount(filter)
         ]);
 
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.USERS_RETRIEVED,
             data: {
@@ -43,7 +48,7 @@ const getAllUsers = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
             message: RESPONSE_MESSAGES.FAILED_RETRIEVE_USERS,
             error: {
@@ -87,7 +92,6 @@ const createAdmin = async (req, res) => {
     try {
         const { email, username, password } = req.body;
 
-        // Validate required fields
         if (!email || !username || !password) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
@@ -98,7 +102,6 @@ const createAdmin = async (req, res) => {
             });
         }
 
-        // Create admin user
         const admin = await userService.createUser({
             email,
             username,
