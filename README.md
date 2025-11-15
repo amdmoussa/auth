@@ -13,7 +13,7 @@ Server runs on `http://localhost:3000`
 ## TODOS
 - ~~Add email verification support (for account creation and email confirmation)~~ ✅ **Completed**
 - ~~Add password reset functionality with secure reset tokens~~ ✅ **Completed**
-- Implement rate limiting for authentication endpoints
+- ~~Implement rate limiting for authentication endpoints~~ ✅ **Completed**
 - Audit logging for security events
 - Implement two-factor authentication (2FA) using TOTP or SMS
 - Add account lockout after failed login attempts
