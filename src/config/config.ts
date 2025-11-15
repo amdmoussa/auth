@@ -4,8 +4,6 @@
 // Created by Ahmed Moussa, 12/11/2025
 //
 
-require('dotenv').config();
-
 // ===================================
 // ENVIRONMENT & VALIDATION
 // ===================================
@@ -28,20 +26,13 @@ if (!process.env.JWT_SECRET) {
 // ===================================
 
 export const AUTH_CONFIG = {
-    // JWT Secret key
     JWT_SECRET: process.env.JWT_SECRET,
-    
     // Access token expiry time (short-lived)
-    // Use format: "15m", "1h", "7d", etc. (passed to jsonwebtoken)
     ACCESS_TOKEN_EXPIRY: process.env.JWT_EXPIRES_IN || '15m',
-    
     // Refresh token expiry time (long-lived)
-    // Used to calculate expiration date for refresh tokens stored in DB
     REFRESH_TOKEN_EXPIRY_DAYS: parseInt(process.env.REFRESH_TOKEN_EXPIRY_DAYS || '7'),
-    
     // Email verification token expiry time (in hours)
     VERIFICATION_TOKEN_EXPIRY_HOURS: parseInt(process.env.VERIFICATION_TOKEN_EXPIRY_HOURS || '24'),
-    
     // Password reset token expiry time (in hours)
     PASSWORD_RESET_TOKEN_EXPIRY_HOURS: parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRY_HOURS || '1'),
 };

@@ -9,6 +9,7 @@ const express = require('express');
 const router = express.Router();
 
 const userController = require('../controllers/user.controller');
+const signupValidation = require('../validations/signup.validation');
 const {
     authenticateToken,
     isAdmin,
@@ -23,7 +24,7 @@ router.get('/', authenticateToken, isAdmin, userController.getAllUsers);
 router.get('/:id', authenticateToken, isOwnerOrAdmin, userController.getUserById);
 
 // create admin (superadmin only)
-router.post('/admin', authenticateToken, isSuperAdmin, userController.createAdmin);
+router.post('/admin', authenticateToken, isSuperAdmin, signupValidation.validateBody, userController.createAdmin);
 
 // update user (superadmin for role changes, otherwise self or admin)
 router.put('/:id', authenticateToken, isSuperAdmin, userController.updateUser);

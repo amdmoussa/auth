@@ -16,8 +16,6 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const { RESPONSE_MESSAGES, HTTP_STATUS } = require('./config/config');
 
-require('dotenv').config()
-
 // MARK: Middlewares
 app.use(helmet());
 app.use(cors());

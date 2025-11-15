@@ -8,11 +8,11 @@ const jwt = require('jsonwebtoken');
 
 const userService = require('../services/user.service');
 const authService = require('../services/auth.service');
+
 const {
     AUTH_CONFIG,
     RESPONSE_MESSAGES,
     RESPONSE_STATUS,
-    VALIDATION,
     USER_ROLES,
     HTTP_STATUS
 } = require('../config/config');
@@ -20,16 +20,6 @@ const {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: RESPONSE_STATUS.ERROR,
-                message: RESPONSE_MESSAGES.VALIDATION_FAILED,
-                error: {
-                    details: RESPONSE_MESSAGES.EMAIL_PASSWORD_REQUIRED
-                }
-            });
-        }
 
         const user = await userService.verifyCredentials(email, password);
 
@@ -80,28 +70,8 @@ const signup = async (req, res) => {
     try {
         const { email, username, password } = req.body;
 
-        if (!email || !username || !password) {
-            return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: RESPONSE_STATUS.ERROR,
-                message: RESPONSE_MESSAGES.VALIDATION_FAILED,
-                error: {
-                    details: RESPONSE_MESSAGES.EMAIL_USERNAME_PASSWORD_REQUIRED
-                }
-            });
-        }
-
-        if (password.length < VALIDATION.PASSWORD_MIN_LENGTH) {
-            return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: RESPONSE_STATUS.ERROR,
-                message: RESPONSE_MESSAGES.VALIDATION_FAILED,
-                error: {
-                    details: RESPONSE_MESSAGES.PASSWORD_MIN_LENGTH
-                }
-            });
-        }
-
         const user = await userService.createUser({
-            email,
+            email,  
             username,
             password,
             role: USER_ROLES.USER

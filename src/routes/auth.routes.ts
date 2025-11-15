@@ -9,12 +9,14 @@ const express = require('express');
 const router = express.Router();
 
 const authController = require('../controllers/auth.controller');
+const loginValidation = require('../validations/login.validation');
+const signupValidation = require('../validations/signup.validation');
 
 // login (public)
-router.post('/login', authController.login);
+router.post('/login', loginValidation.validateBody, authController.login);
 
 // signup (public)
-router.post('/signup', authController.signup);
+router.post('/signup', signupValidation.validateBody, authController.signup);
 
 // logout (requires valid token)
 router.post('/logout', authController.logout);
