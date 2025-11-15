@@ -30,4 +30,7 @@ router.post('/revoke', authController.revoke);
 // revoke all refresh tokens for user (requires valid access token)
 router.post('/revoke-all', authController.revokeAll);
 
+// verify email (public)
+router.get('/verify-email/:token', authController.verifyEmail);
+
 module.exports = router;

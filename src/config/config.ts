@@ -201,7 +201,7 @@ export const CORS_CONFIG = {
 } as const;
 
 // Default export
-export default {
+module.exports = {
     AUTH_CONFIG,
     TOKEN_TYPES,
     USER_ROLES,

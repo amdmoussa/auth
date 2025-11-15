@@ -114,7 +114,7 @@ const PASSWORD_RESET_BODY = `
 const ACCOUNT_CREATION_TEMPLATE = createEmailTemplate('Validate Your Account', ACCOUNT_CREATION_BODY);
 const PASSWORD_RESET_TEMPLATE = createEmailTemplate('Reset Your Password', PASSWORD_RESET_BODY);
 
-export default {
+module.exports = {
   ACCOUNT_CREATION_TEMPLATE,
   PASSWORD_RESET_TEMPLATE
 };

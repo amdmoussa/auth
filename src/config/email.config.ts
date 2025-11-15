@@ -27,4 +27,4 @@ transporter.verify((error, success) => {
   }
 });
 
-export default transporter;
+module.exports = transporter;

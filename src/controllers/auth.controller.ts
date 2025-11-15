@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 
 const userService = require('../services/user.service');
 const authService = require('../services/auth.service');
+const emailService = require('../services/email.service');
 
 const {
     AUTH_CONFIG,
@@ -71,19 +72,19 @@ const signup = async (req, res) => {
         const { email, username, password } = req.body;
 
         const user = await userService.createUser({
-            email,  
+            email,
             username,
             password,
             role: USER_ROLES.USER
         });
 
-        const accessToken = jwt.sign(
-            { id: user._id, email: user.email, role: user.role },
-            AUTH_CONFIG.JWT_SECRET,
-            { expiresIn: AUTH_CONFIG.ACCESS_TOKEN_EXPIRY }
-        );
+        const verificationToken = await authService.generateVerificationToken(user._id);
 
-        const refreshToken = await authService.generateRefreshToken(user._id);
+        await emailService.sendVerificationEmail(
+            user.email,
+            user.username,
+            verificationToken
+        );
 
         res.status(HTTP_STATUS.CREATED).json({
             status: RESPONSE_STATUS.SUCCESS,
@@ -94,9 +95,7 @@ const signup = async (req, res) => {
                     email: user.email,
                     username: user.username,
                     role: user.role
-                },
-                accessToken,
-                refreshToken
+                }
             }
         });
     } catch (error) {
@@ -286,11 +285,56 @@ const revokeAll = async (req, res) => {
     }
 };
 
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        const userId = await authService.verifyVerificationToken(token);
+
+        if (!userId) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: 'Invalid or expired verification token'
+            });
+        }
+
+        const user = await userService.updateUser(userId, { isVerified: true });
+        if (!user) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: 'User not found'
+            });
+        }
+
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: 'Email verified successfully',
+            data: {
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    username: user.username,
+                    isVerified: user.isVerified
+                }
+            }
+        });
+    } catch (error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: 'Email verification failed',
+            error: {
+                details: error.message
+            }
+        });
+    }
+};
+
 module.exports = {
     login,
     signup,
     logout,
     refresh,
     revoke,
-    revokeAll
+    revokeAll,
+    verifyEmail
 };
