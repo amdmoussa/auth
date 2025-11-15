@@ -1,7 +1,6 @@
 # Auth System API
 
-An authentication system built with Node.js, Express, TypeScript, and MongoDB. Features JWT access tokens with automatic refresh mechanism, role-based access control, and secure password management using bcrypt.
-
+An authentication system built with Node.js, Express, TypeScript, and MongoDB. Features JWT access tokens with automatic refresh mechanism, role-based access control, secure password management using bcrypt, and comprehensive email-based verification and password recovery.
 ## Quick Start
 
 ```bash
@@ -12,12 +11,13 @@ npm start
 Server runs on `http://localhost:3000`
 
 ## TODOS
-- Add email verification support (for account creation and email confirmation)
-- Implement two-factor authentication (2FA) using TOTP or SMS
-- Add password reset functionality with secure reset tokens
-- Implement rate limiting
+- ~~Add email verification support (for account creation and email confirmation)~~ ✅ **Completed**
+- ~~Add password reset functionality with secure reset tokens~~ ✅ **Completed**
+- Implement rate limiting for authentication endpoints
 - Audit logging for security events
-- Proper CORS configuration
+- Implement two-factor authentication (2FA) using TOTP or SMS
+- Add account lockout after failed login attempts
+- Proper CORS configuration for production
 
 ### Might add (not sure)
 - Session management and device tracking

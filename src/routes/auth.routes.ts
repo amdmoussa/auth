@@ -12,11 +12,18 @@ const authController = require('../controllers/auth.controller');
 const loginValidation = require('../validations/login.validation');
 const signupValidation = require('../validations/signup.validation');
 
+const { 
+    authLimiter, 
+    loginLimiter, 
+    passwordResetLimiter,
+    emailVerificationLimiter 
+} = require('../config/rateLimiter.config');
+
 // login (public)
-router.post('/login', loginValidation.validateBody, authController.login);
+router.post('/login', loginLimiter, loginValidation.validateBody, authController.login);
 
 // signup (public)
-router.post('/signup', signupValidation.validateBody, authController.signup);
+router.post('/signup', authLimiter, signupValidation.validateBody, authController.signup);
 
 // logout (requires valid token)
 router.post('/logout', authController.logout);
@@ -31,12 +38,12 @@ router.post('/revoke', authController.revoke);
 router.post('/revoke-all', authController.revokeAll);
 
 // verify email (public)
-router.get('/verify-email/:token', authController.verifyEmail);
+router.get('/verify-email/:token', emailVerificationLimiter, authController.verifyEmail);
 
 // forgot password (public)
-router.post('/forgot-password', authController.requestForgotPassword);
+router.post('/forgot-password', passwordResetLimiter, authController.requestForgotPassword);
 
 // reset password
-router.post('/reset-password', authController.resetPassword);
+router.post('/reset-password', passwordResetLimiter, authController.resetPassword);
 
 module.exports = router;

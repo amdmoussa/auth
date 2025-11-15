@@ -15,8 +15,10 @@ const morgan = require('morgan');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const { RESPONSE_MESSAGES, HTTP_STATUS } = require('./config/config');
+const { generalLimiter } = require('./config/rateLimiter.config.ts');
 
 // MARK: Middlewares
+app.use(generalLimiter);
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
