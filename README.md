@@ -65,6 +65,10 @@ The system uses a three-tier role hierarchy for granular permission control:
 - `POST /auth/logout` - Logout and revoke refresh token
 - `POST /auth/refresh` - Get new access token using refresh token
 - `POST /auth/revoke` - Revoke refresh token
+- `POST /auth/revoke-all` - Revoke all refresh tokens for one account (requires valid access token)
+- `GET /verify-email/:token` - Verifies a user via a mail received on account creation
+- `POST /forgot-password` - Request a user password reset link sent via email
+- `POST /reset-password` - Resets a user password
 
 ### Users
 - `GET /user/` - Get all users (admin only)
@@ -85,6 +89,12 @@ JWT_EXPIRES_IN=2m
 REFRESH_TOKEN_EXPIRY_DAYS=7
 VERIFICATION_TOKEN_EXPIRY_HOURS=24
 PASSWORD_RESET_TOKEN_EXPIRY_HOURS=1
+FRONTEND_URL=your_frontend_url
+EMAIL_HOST=your_email_host
+EMAIL_PORT=your_email_port
+EMAIL_FROM_NAME=your_service_name
+EMAIL_USER=your_platform_email
+EMAIL_PASSWORD=your_platform_email_password
 ```
 
 ## Token Refresh Flow
