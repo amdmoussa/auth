@@ -10,6 +10,8 @@ npm start
 
 Server runs on `http://localhost:3000`
 
+I will probably build a frontend for this eventually so people can test it out
+
 ## TODOS
 - ~~Add email verification support (for account creation and email confirmation)~~ ✅ **Completed**
 - ~~Add password reset functionality with secure reset tokens~~ ✅ **Completed**
