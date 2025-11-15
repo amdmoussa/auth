@@ -321,7 +321,76 @@ const verifyEmail = async (req, res) => {
     } catch (error) {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
-            message: 'Email verification failed',
+            message: RESPONSE_MESSAGES.SERVER_ERROR,
+            error: {
+                details: error.message
+            }
+        });
+    }
+};
+
+const requestForgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await userService.getUserByEmail(email);
+
+        if (!user) {
+            return res.status(HTTP_STATUS.OK).json({
+                status: RESPONSE_STATUS.SUCCESS,
+                message: RESPONSE_MESSAGES.FORGOT_PASSWORD_SUCCESS
+            });
+        }
+
+        const resetToken = await authService.generatePasswordResetToken(user._id);
+
+        await emailService.sendPasswordResetEmail(
+            user.email,
+            user.username,
+            resetToken
+        );
+
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.FORGOT_PASSWORD_SUCCESS
+        });
+    } catch (error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.SERVER_ERROR,
+            error: {
+                details: error.message
+            }
+        });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        const userId = await authService.verifyPasswordResetToken(token);
+
+        if (!userId) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: RESPONSE_MESSAGES.INVALID_TOKEN
+            });
+        }
+
+        const user = await userService.updatePassword(userId, newPassword);
+
+        await authService.deletePasswordResetToken(token);
+
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: RESPONSE_MESSAGES.PASSWORD_CHANGE_SUCCESS,
+            data: { user }
+        });
+    } catch (error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.SERVER_ERROR,
             error: {
                 details: error.message
             }
@@ -336,5 +405,7 @@ module.exports = {
     refresh,
     revoke,
     revokeAll,
-    verifyEmail
+    verifyEmail,
+    requestForgotPassword,
+    resetPassword
 };

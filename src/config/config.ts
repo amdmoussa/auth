@@ -82,6 +82,9 @@ export const RESPONSE_STATUS = {
 } as const;
 
 export const RESPONSE_MESSAGES = {
+    // Generic errors
+    SERVER_ERROR: "Server error",
+
     // Auth messages
     LOGIN_SUCCESS: 'Login successful',
     LOGIN_FAILED: 'Login failed',
@@ -93,6 +96,8 @@ export const RESPONSE_MESSAGES = {
     TOKEN_REFRESH_FAILED: 'Token refresh failed',
     TOKEN_REVOKE_SUCCESS: 'Token revoked successfully',
     TOKEN_REVOKE_FAILED: 'Token revocation failed',
+    FORGOT_PASSWORD_SUCCESS: 'If an account exists, a password reset email has been sent',
+    PASSWORD_CHANGE_SUCCESS: 'Password changed successfully',
     
     // Authentication errors
     AUTH_REQUIRED: 'Authentication required',

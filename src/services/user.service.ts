@@ -66,6 +66,15 @@ class UserService {
     }
 
     /**
+     * Get user by email
+     * @param email - User email
+     * @returns User object or null
+     */
+    async getUserByEmail(email: string) {
+        return await User.findOne({ email }).select('-password').exec();
+    }
+
+    /**
      * Create a new user
      * @param userData - User data { email, username, password, role }
      * @returns Created user object

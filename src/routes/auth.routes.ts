@@ -33,4 +33,10 @@ router.post('/revoke-all', authController.revokeAll);
 // verify email (public)
 router.get('/verify-email/:token', authController.verifyEmail);
 
+// forgot password (public)
+router.post('/forgot-password', authController.requestForgotPassword);
+
+// reset password
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;
