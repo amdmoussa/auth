@@ -77,7 +77,7 @@ The system uses a three-tier role hierarchy for granular permission control:
 - `GET /user/:id` - Get user by ID (self or admin)
 - `POST /user/admin` - Create admin user (superadmin only)
 - `PUT /user/:id` - Update user (superadmin for role changes, otherwise self)
-- `PUT /user/:id/change-password` - Update user password
+- `PUT /user/:id/change-password` - Update user password (self only)
 - `DELETE /user/:id` - Delete user (self, admin, or superadmin)
 
 ## Environment variables

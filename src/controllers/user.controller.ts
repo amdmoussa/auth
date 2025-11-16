@@ -208,21 +208,21 @@ const changePassword = async (req, res) => {
         if (!oldPassword || !newPassword) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
-                message: 'Old password and new password are required'
+                message: RESPONSE_MESSAGES.OLDPASSWORD_NEWPASSWORD_REQUIRED
             });
         }
 
         if (userId !== id) {
             return res.status(HTTP_STATUS.FORBIDDEN).json({
                 status: RESPONSE_STATUS.ERROR,
-                message: 'You can only change your own password'
+                message: RESPONSE_MESSAGES.CAN_ONLY_CHANGE_OWN_PASSWORD
             });
         }
 
         if (newPassword.length < 6) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: RESPONSE_STATUS.ERROR,
-                message: 'New password must be at least 6 characters'
+                message: RESPONSE_MESSAGES.PASSWORD_MIN_LENGTH
             });
         }
 
@@ -230,7 +230,7 @@ const changePassword = async (req, res) => {
 
         res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
-            message: 'Password changed successfully',
+            message: RESPONSE_MESSAGES.PASSWORD_CHANGE_SUCCESS,
             data: { user }
         });
     } catch (error) {
@@ -278,7 +278,7 @@ const deleteUser = async (req, res) => {
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.ACCESS_DENIED,
                 error: {
-                    details: 'You can only delete your own account'
+                    details: RESPONSE_MESSAGES.CAN_ONLY_DELETE_OWN_ACCOUNT
                 }
             });
         }

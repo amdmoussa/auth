@@ -122,6 +122,9 @@ export const RESPONSE_MESSAGES = {
     EMAIL_USERNAME_PASSWORD_REQUIRED: 'Email, username, and password are required',
     PASSWORD_MIN_LENGTH: 'Password must be at least 6 characters long',
     USER_ALREADY_EXISTS: 'User with this email or username already exists',
+    OLDPASSWORD_NEWPASSWORD_REQUIRED: 'Old password and new password are required',
+    CAN_ONLY_CHANGE_OWN_PASSWORD: 'You can only change your own password',
+    CAN_ONLY_DELETE_OWN_ACCOUNT: 'You can only delete your own account',
     
     // Authorization errors
     ADMIN_REQUIRED: 'Admin access required',
