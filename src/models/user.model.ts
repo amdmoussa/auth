@@ -27,6 +27,7 @@ const userSchema = new Schema<IUser>(
             unique: true,
             lowercase: true,
             trim: true,
+            immutable: true
         },
         password: {
             type: String,
@@ -38,6 +39,7 @@ const userSchema = new Schema<IUser>(
             required: true,
             unique: true,
             trim: true,
+            immutable: true
         },
         role: {
             type: String,

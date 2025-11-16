@@ -56,7 +56,7 @@ const getAllUsers = async (req, res) => {
             }
         });
     }
-}
+};
 
 const getUserById = async (req, res) => {
     const { id } = req.params;
@@ -86,7 +86,7 @@ const getUserById = async (req, res) => {
             }
         });
     }
-}
+};
 
 const createAdmin = async (req, res) => {
     try {
@@ -123,17 +123,41 @@ const createAdmin = async (req, res) => {
             }
         });
     }
-}
+};
 
 const updateUser = async (req, res) => {
     const { id } = req.params;
     try {
         const updates = req.body;
 
+        delete updates.password;
+        delete updates.isVerified;
+
         // Role change restrictions - only super admin can change roles
         if (updates.role) {
-            // Super admin cannot demote themselves
-            if (req.user.id === id && updates.role !== USER_ROLES.SUPER_ADMIN) {
+            if (req.user.role !== USER_ROLES.SUPER_ADMIN) {
+                return res.status(HTTP_STATUS.FORBIDDEN).json({
+                    status: RESPONSE_STATUS.ERROR,
+                    message: RESPONSE_MESSAGES.ACCESS_DENIED,
+                    error: {
+                        details: 'Only super admins can change user roles'
+                    }
+                });
+            }
+
+            const targetUser = await userService.getUserById(id);
+
+            if (!targetUser) {
+                return res.status(HTTP_STATUS.NOT_FOUND).json({
+                    status: RESPONSE_STATUS.ERROR,
+                    message: RESPONSE_MESSAGES.USER_NOT_FOUND,
+                    error: {
+                        details: `No user found with id: ${id}`
+                    }
+                });
+            }
+
+            if (req.user.id === id && targetUser.role === USER_ROLES.SUPER_ADMIN) {
                 return res.status(HTTP_STATUS.FORBIDDEN).json({
                     status: RESPONSE_STATUS.ERROR,
                     message: RESPONSE_MESSAGES.ACCESS_DENIED,
@@ -143,8 +167,6 @@ const updateUser = async (req, res) => {
                 });
             }
         }
-
-        delete updates.password;
 
         const updatedUser = await userService.updateUser(id, updates);
 
@@ -161,18 +183,66 @@ const updateUser = async (req, res) => {
         res.status(HTTP_STATUS.OK).json({
             status: RESPONSE_STATUS.SUCCESS,
             message: RESPONSE_MESSAGES.USER_UPDATED,
-            data: { user: updatedUser }
+            data: {
+                user: updatedUser
+            }
         });
     } catch (error) {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
-            message: RESPONSE_MESSAGES.SIGNUP_FAILED,
+            message: RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR,
             error: {
                 details: error.message
             }
         });
     }
-}
+};
+
+const changePassword = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    try {
+        const { oldPassword, newPassword } = req.body;
+
+        if (!oldPassword || !newPassword) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: 'Old password and new password are required'
+            });
+        }
+
+        if (userId !== id) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: 'You can only change your own password'
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: RESPONSE_STATUS.ERROR,
+                message: 'New password must be at least 6 characters'
+            });
+        }
+
+        const user = await userService.changePassword(id, oldPassword, newPassword);
+
+        res.status(HTTP_STATUS.OK).json({
+            status: RESPONSE_STATUS.SUCCESS,
+            message: 'Password changed successfully',
+            data: { user }
+        });
+    } catch (error) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: RESPONSE_STATUS.ERROR,
+            message: RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR,
+            error: {
+                details: error.message
+            }
+        });
+    }
+};
 
 const deleteUser = async (req, res) => {
     const { id } = req.params;
@@ -233,18 +303,19 @@ const deleteUser = async (req, res) => {
     } catch (error) {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: RESPONSE_STATUS.ERROR,
-            message: RESPONSE_MESSAGES.SIGNUP_FAILED,
+            message: RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR,
             error: {
                 details: error.message
             }
         });
     }
-}
+};
 
 module.exports = {
     getAllUsers,
     getUserById,
     createAdmin,
     updateUser,
+    changePassword,
     deleteUser
 };

@@ -75,7 +75,7 @@ const isOwnerOrAdmin = async (req, res, next): Promise<void> => {
 
     const resourceId = req.params.id;
     const isOwner = req.user.id === resourceId;
-    const isAdminRole = req.user.role === USER_ROLES.ADMIN;
+    const isAdminRole = req.user.role === USER_ROLES.ADMIN || req.user.role === USER_ROLES.SUPER_ADMIN;
 
     if (!isOwner && !isAdminRole) {
         res.status(HTTP_STATUS.FORBIDDEN).json({

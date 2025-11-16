@@ -138,7 +138,7 @@ class UserService {
     }
 
     /**
-     * Update user password
+     * Replaces the user password (force)
      * @param id - User ID
      * @param newPassword - New password
      * @returns Updated user object
@@ -150,6 +150,33 @@ class UserService {
             throw new Error('User not found');
         }
 
+        user.password = newPassword;
+        await user.save();
+
+        const userObject = user.toObject();
+        delete userObject.password;
+        return userObject;
+    }
+
+    /**
+     * Change user password (verify old password first)
+     * @param id - User ID
+     * @param oldPassword - Current password
+     * @param newPassword - New password
+     * @returns Updated user object
+     */
+    async changePassword(id: string, oldPassword: string, newPassword: string) {
+        const user = await User.findById(id).select('+password');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const isPasswordValid = await user.comparePassword(oldPassword);
+
+        if (!isPasswordValid) {
+            throw new Error('Current password is incorrect');
+        }
         user.password = newPassword;
         await user.save();
 

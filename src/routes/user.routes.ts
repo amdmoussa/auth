@@ -27,7 +27,10 @@ router.get('/:id', authenticateToken, isOwnerOrAdmin, userController.getUserById
 router.post('/admin', authenticateToken, isSuperAdmin, signupValidation.validateBody, userController.createAdmin);
 
 // update user (superadmin for role changes, otherwise self or admin)
-router.put('/:id', authenticateToken, isSuperAdmin, userController.updateUser);
+router.put('/:id', authenticateToken, isOwnerOrAdmin, userController.updateUser);
+
+// change password
+router.put('/:id/change-password', authenticateToken, userController.changePassword);
 
 // delete user (self or admin)
 router.delete('/:id', authenticateToken, isOwnerOrAdmin, userController.deleteUser);
