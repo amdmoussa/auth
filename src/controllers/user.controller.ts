@@ -67,7 +67,7 @@ const getUserById = async (req, res) => {
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
-                    details: `No user found with id: ${id}`
+                    details: RESPONSE_MESSAGES.USER_NOT_FOUND_WITH_ID.replace("{{ID}}", id)
                 }
             });
         }
@@ -152,7 +152,7 @@ const updateUser = async (req, res) => {
                     status: RESPONSE_STATUS.ERROR,
                     message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                     error: {
-                        details: `No user found with id: ${id}`
+                        details: RESPONSE_MESSAGES.USER_NOT_FOUND_WITH_ID.replace("{{ID}}", id)
                     }
                 });
             }
@@ -175,7 +175,7 @@ const updateUser = async (req, res) => {
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
-                    details: `No user found with id: ${id}`
+                    details: RESPONSE_MESSAGES.USER_NOT_FOUND_WITH_ID.replace("{{ID}}", id)
                 }
             });
         }
@@ -247,14 +247,13 @@ const changePassword = async (req, res) => {
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
-        // Check if target user is super admin - cannot be deleted by anyone
         const targetUser = await userService.getUserById(id);
         if (!targetUser) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
-                    details: `No user found with id: ${id}`
+                    details: RESPONSE_MESSAGES.USER_NOT_FOUND_WITH_ID.replace("{{ID}}", id)
                 }
             });
         }
@@ -269,7 +268,6 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        // Allow deletion of own account or admin/superadmin deleting others
         const isOwnAccount = req.user.id === id;
 
         // Only owner or admin can delete a user
@@ -290,7 +288,7 @@ const deleteUser = async (req, res) => {
                 status: RESPONSE_STATUS.ERROR,
                 message: RESPONSE_MESSAGES.USER_NOT_FOUND,
                 error: {
-                    details: `No user found with id: ${id}`
+                    details: RESPONSE_MESSAGES.USER_NOT_FOUND_WITH_ID.replace("{{ID}}", id)
                 }
             });
         }
