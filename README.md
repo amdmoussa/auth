@@ -22,7 +22,6 @@ I will probably build a frontend for this eventually so people can test it out
 - Proper CORS configuration for production
 
 ### Might add (not sure)
-- Session management and device tracking
 - Implement OAuth 2.0 server for third-party integrations
 - Add webhook support for auth events
 - Implement backup codes for 2FA recovery
